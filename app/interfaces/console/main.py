@@ -50,7 +50,7 @@ class ConsoleHandler(InterfaceHandlerABC):
     def __parse_input(self, input_string) -> Tuple[CommandABC, list]:
         searching_pseudo = next((pseudo for pseudo in self.commands_list.pseudos_list if re.search(f"^({pseudo}(\s|$))", input_string)), None)
         if not searching_pseudo:
-            raise UndedinedCommandException
+            raise UndefinedCommandException
         command = self.commands_list.get_command(searching_pseudo)
         args = input_string[len(searching_pseudo) + 1:].split(' ')
         return (command, list(filter(lambda arg: arg, args)))
@@ -77,5 +77,5 @@ class ConsoleHandler(InterfaceHandlerABC):
             except UndedinedCommandException:
                 print("We can't find this command, please try again or use help command.")
 
-class UndedinedCommandException(Exception):
+class UndefinedCommandException(Exception):
     pass
