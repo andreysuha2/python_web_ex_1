@@ -2,4 +2,4 @@
 .git
 .vscode/*
 **/test_folder
-virtemv/
+virtenv/

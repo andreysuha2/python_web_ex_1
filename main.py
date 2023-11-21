@@ -1,44 +1,35 @@
-from prompt_toolkit import prompt
-from prompt_toolkit.completion import NestedCompleter
+from app.interfaces.console import ConsoleHandler, ConsoleInterface
+from app.interfaces.console.CommandsList import CommandsList
+from app.interfaces.console import Commands as commands
 
-from app.input_handler import get_comand
-from app.comands import HANDLERS, ADDRESS_BOOK
+commands_list = CommandsList()
 
-def close():
-    ADDRESS_BOOK.save_book()
-    print("Thank you! Your dictionary is saved")
+commands_list.add_command(pseudos=('help',), command=commands.HelpCommand(commands_list=commands_list))
+commands_list.add_command(pseudos=('close', 'exit', 'good bye', 'bye'), command=commands.CloseCommand())
+commands_list.add_command(pseudos=('search',), command=commands.SearchCommand())
+commands_list.add_command(pseudos=('add contact',), command=commands.AddContactCommand())
+commands_list.add_command(pseudos=('add phone', 'add phones'), command=commands.AddPhonesCommand())
+commands_list.add_command(pseudos=('add birthday', ), command=commands.AddBirthdayCommand())
+commands_list.add_command(pseudos=('add address', ), command=commands.AddAddress())
+commands_list.add_command(pseudos=('add mail', ), command=commands.AddMail())
+commands_list.add_command(pseudos=('remove contact', ), command=commands.RemoveContactCommand())
+commands_list.add_command(pseudos=('show contact', ), command=commands.ShowContactCommand())
+commands_list.add_command(pseudos=('change phone', ), command=commands.ChangePhoneCommand())
+commands_list.add_command(pseudos=('remove phone', ), command=commands.RemovePhoneCommand())
+commands_list.add_command(pseudos=('days to birthday',), command=commands.DaysToBirthday())
+commands_list.add_command(pseudos=('birthdays range',), command=commands.BirthdaysRange())
+commands_list.add_command(pseudos=('show all', ), command=commands.ShowAllContacts())
+commands_list.add_command(pseudos=('add note',), command=commands.AddNoteCommand())
+commands_list.add_command(pseudos=('update note',), command=commands.UpdateNoteCommand())
+commands_list.add_command(pseudos=('delete note',), command=commands.DeleteNoteCommand())
+commands_list.add_command(pseudos=('searh note',), command=commands.SearchNoteCommand())
+commands_list.add_command(pseudos=('sort file',), command=commands.SortFilesCommand())
 
-# створення списку підказок
-from app.comands import CLOSE_COMANDS
-variants = {}
-for i in HANDLERS.keys():
-    variants[i] = None
-for i in CLOSE_COMANDS:
-    variants[i] = None
-# Створення об'єкта WordCompleter для автодоповнення
-completer = NestedCompleter.from_nested_dict(variants)
-
-GREEN = "\033[92m"     #for green greeting
+INTERFACE_HANDLERS = [ ConsoleHandler(interface=ConsoleInterface(commands_list=commands_list), commands_list=commands_list) ]
 
 def main():
-    print(f'{GREEN}\r\nHello!!! \r\nYoy can use "help" comand ')
-    while True:
-        try:
-            enter_string = (prompt (">>>", completer=completer )).strip()
-            input_handler = get_comand(enter_string)
-            is_close = next(input_handler)
-            if is_close:
-                close()
-                break
-            comand_exist, comand, args = next(input_handler)
-            if comand_exist:
-                result = HANDLERS[comand](args)
-                print(f"{result}\n")
-            else:
-                print(f'Comand "{comand}" not found')
-        except KeyboardInterrupt:
-            close()
-            break
+    for handler in INTERFACE_HANDLERS:
+        handler.run()
 
 if __name__ == "__main__":
     main()
