@@ -1,7 +1,6 @@
 from app.interfaces.InterfaceABC import InterfaceHandlerABC, IntrfaceABC
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import NestedCompleter
-from app.comands import CLOSE_COMANDS, HANDLERS
 from app.interfaces.console.CommandsList import CommandsList
 from app.interfaces.console import Commands as commands
 from app.interfaces.console.CommandABC import CommandABC
@@ -9,9 +8,9 @@ from typing import Tuple
 import re
 
 class ConsoleInterface(IntrfaceABC):
-    def __init__(self) -> None:
+    def __init__(self, commands_list: CommandsList) -> None:
         super().__init__()
-        self.completer = NestedCompleter.from_nested_dict({ k: None for k in  [ *HANDLERS.keys(), *CLOSE_COMANDS ] })
+        self.completer = NestedCompleter.from_nested_dict({ k: None for k in  commands_list.pseudos_list })
         
     def input(self, input_text=">>> "):
         return (prompt(input_text, completer=self.completer)).strip()
@@ -20,32 +19,9 @@ class ConsoleInterface(IntrfaceABC):
         return print(*args)
     
 class ConsoleHandler(InterfaceHandlerABC):
-    def __init__(self, interface: IntrfaceABC):
+    def __init__(self, interface: IntrfaceABC, commands_list: CommandsList):
         super().__init__(interface)
-        self.commands_list = CommandsList()
-        self.__init_commands()
-
-    def __init_commands(self):
-        self.commands_list.add_command(pseudos=('help',), command=commands.HelpCommand(commands_list=self.commands_list))
-        self.commands_list.add_command(pseudos=('close', 'exit', 'good bye', 'bye'), command=commands.CloseCommand())
-        self.commands_list.add_command(pseudos=('search',), command=commands.SearchCommand())
-        self.commands_list.add_command(pseudos=('add contact',), command=commands.AddContactCommand())
-        self.commands_list.add_command(pseudos=('add phone', 'add phones'), command=commands.AddPhonesCommand())
-        self.commands_list.add_command(pseudos=('add birthday', ), command=commands.AddBirthdayCommand())
-        self.commands_list.add_command(pseudos=('add address', ), command=commands.AddAddress())
-        self.commands_list.add_command(pseudos=('add mail', ), command=commands.AddMail())
-        self.commands_list.add_command(pseudos=('remove contact', ), command=commands.RemoveContactCommand())
-        self.commands_list.add_command(pseudos=('show contact', ), command=commands.ShowContactCommand())
-        self.commands_list.add_command(pseudos=('change phone', ), command=commands.ChangePhoneCommand())
-        self.commands_list.add_command(pseudos=('remove phone', ), command=commands.RemovePhoneCommand())
-        self.commands_list.add_command(pseudos=('days to birthday',), command=commands.DaysToBirthday())
-        self.commands_list.add_command(pseudos=('birthdays range',), command=commands.BirthdaysRange())
-        self.commands_list.add_command(pseudos=('show all', ), command=commands.ShowAllContacts())
-        self.commands_list.add_command(pseudos=('add note',), command=commands.AddNoteCommand())
-        self.commands_list.add_command(pseudos=('update note',), command=commands.UpdateNoteCommand())
-        self.commands_list.add_command(pseudos=('delete note',), command=commands.DeleteNoteCommand())
-        self.commands_list.add_command(pseudos=('searh note',), command=commands.SearchNoteCommand())
-        self.commands_list.add_command(pseudos=('sort file',), command=commands.SortFilesCommand())
+        self.commands_list = commands_list
         
     def __parse_input(self, input_string) -> Tuple[CommandABC, list]:
         searching_pseudo = next((pseudo for pseudo in self.commands_list.pseudos_list if re.search(f"^({pseudo}(\s|$))", input_string)), None)
