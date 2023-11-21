@@ -2,7 +2,6 @@ from app.interfaces.InterfaceABC import InterfaceHandlerABC, IntrfaceABC
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import NestedCompleter
 from app.interfaces.console.CommandsList import CommandsList
-from app.interfaces.console import Commands as commands
 from app.interfaces.console.CommandABC import CommandABC
 from typing import Tuple
 import re
