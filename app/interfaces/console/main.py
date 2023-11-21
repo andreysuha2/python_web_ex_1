@@ -74,7 +74,7 @@ class ConsoleHandler(InterfaceHandlerABC):
                 command = self.commands_list.get_command('close')
                 self.__execute_comand(command, [])
                 break
-            except UndedinedCommandException:
+            except UndefinedCommandException:
                 print("We can't find this command, please try again or use help command.")
 
 class UndefinedCommandException(Exception):
